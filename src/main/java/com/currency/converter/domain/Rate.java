@@ -3,10 +3,7 @@ package com.currency.converter.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
