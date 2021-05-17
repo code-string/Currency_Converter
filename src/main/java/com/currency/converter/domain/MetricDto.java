@@ -4,36 +4,33 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.NotBlank;
 
-import javax.persistence.*;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Metric {
+public class MetricDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+    @NotBlank
     private String url;
 
+    @NotBlank
     private String ipAddress;
 
-    @OneToMany(fetch = FetchType.LAZY)
     private List<FailedRequest> failedRequestStatusCode = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
     private List<SuccessRequest> successRequestStatusCode = new ArrayList<>();
 
     @JsonIgnore
+    @NotBlank
     @Temporal(TemporalType.DATE)
     private Date timestamp;
-
 }
