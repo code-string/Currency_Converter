@@ -1,11 +1,10 @@
 package com.currency.converter.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Getter
@@ -13,15 +12,30 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class FailedRequest {
+public class RequestInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    private String url;
+
     private Short statusCode;
 
+    @Enumerated(EnumType.STRING)
+    private RequestInfoType requestInfoType;
+
     private Integer count;
+
+    @JsonIgnore
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timestamp;
+
+    public RequestInfo(Short code, String url) {
+        statusCode = code;
+        this.url = url;
+        count = 0;
+    }
 
     @Override
     public String toString() {
@@ -35,7 +49,7 @@ public class FailedRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FailedRequest that = (FailedRequest) o;
+        RequestInfo that = (RequestInfo) o;
         return getId().equals(that.getId());
     }
 

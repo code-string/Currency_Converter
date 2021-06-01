@@ -2,6 +2,7 @@ package com.currency.converter.service;
 
 import com.currency.converter.annotation.TOUpper;
 import com.currency.converter.domain.*;
+import com.currency.converter.exception.BadCodeRuntimeException;
 import com.currency.converter.repository.RateRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -42,7 +43,7 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService{
 
 
     @Override
-    public CurrencyConversion convertFromTo(@TOUpper String base, @TOUpper String code, Float amount) throws Exception {
+    public CurrencyConversion convertFromTo(@TOUpper String base, @TOUpper String code, Float amount) throws BadCodeRuntimeException {
         logger.info(String.format("rate conversion starting at %s ....",CurrencyConversionServiceImpl.class));
         Rate baseRate = new Rate(CurrencyExchange.BASE_CODE, 1.0f, new Date());
         Rate codeRate = new Rate(CurrencyExchange.BASE_CODE, 1.0f, new Date());
@@ -54,26 +55,26 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService{
 
         if(!CurrencyExchange.BASE_CODE.equals(code)) {
             codeRate = repository.findByDateAndCode(new Date(), code).orElse(null);
-            logger.info("code rate =++++++ gotten in " + codeRate.getCode());
+//            logger.info("code rate =++++++ gotten in " + codeRate.getCode());
         }
 
 
         if(codeRate == null || baseRate == null)
-            throw new Exception("Code or Base invalid");
+            throw new BadCodeRuntimeException("Code or Base invalid");
 
         logger.info(String.format("rate conversion ending at %s ....",getClass().getName()));
         return new CurrencyConversion(base, code, amount, (codeRate.getRate()/ baseRate.getRate()) * amount);
     }
 
     @Override
-    public Rate[] calculateByCode(@TOUpper String code, Date date) throws Exception {
+    public Rate[] calculateByCode(@TOUpper String code, Date date) throws BadCodeRuntimeException {
         List<Rate> rates = repository.findByDate(date);
         if(code.equals(CurrencyExchange.BASE_CODE))
             return rates.toArray(new Rate[0]);
 
         Rate baseRate = rates.stream().filter(rate -> rate.getCode().equals(code)).findFirst().orElse(null);
         if(baseRate == null)
-            throw new Exception("Invalid code!");
+            throw new BadCodeRuntimeException("Invalid code!");
 
         return Stream.concat(rates.stream().filter(n -> !n.getCode().equals(code))
                 .map(n -> new Rate(n.getCode(),
